@@ -47,6 +47,6 @@ public class Decoder extends ByteToMessageDecoder {
         message.setHeader(header);
 
         ISerialization serialization = serialize.clazz.newInstance();
-        // todo 
+        // todo
     }
 }
