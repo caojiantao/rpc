@@ -10,11 +10,11 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum ESerializeType {
 
-    JSON((byte) 1, JsonSerialization.class),
+    JSON((byte) 1, new JsonSerialization()),
     ;
 
     public byte value;
-    public Class<? extends ISerialization> clazz;
+    public ISerialization serialization;
 
     public static ESerializeType ofValue(byte type) {
         for (ESerializeType serialize : ESerializeType.values()) {

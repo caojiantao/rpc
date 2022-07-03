@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.caojiantao.rpc</groupId>
-            <artifactId>rpc-registry</artifactId>
+            <artifactId>rpc-transport</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

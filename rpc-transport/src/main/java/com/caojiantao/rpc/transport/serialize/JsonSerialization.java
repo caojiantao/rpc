@@ -1,6 +1,6 @@
 package com.caojiantao.rpc.transport.serialize;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.caojiantao.rpc.common.utils.JsonUtils;
 
 import java.io.IOException;
 
@@ -9,15 +9,14 @@ import java.io.IOException;
  */
 public class JsonSerialization implements ISerialization {
 
-    private ObjectMapper mapper;
 
     @Override
     public <T> byte[] serialize(T data) throws IOException {
-        return mapper.writeValueAsBytes(data);
+        return JsonUtils.bytes(data);
     }
 
     @Override
     public <T> T deserialize(byte[] data, Class<T> clazz) throws IOException {
-        return mapper.readValue(data, clazz);
+        return JsonUtils.parse(data, clazz);
     }
 }

@@ -12,14 +12,14 @@ public class ServiceInfo {
 
     private String app;
     private String name;
-    private String ip;
+    private String host;
     private Integer port;
 
     @SneakyThrows
     public ServiceInstance<ServiceInfo> toInstance() {
         return ServiceInstance.<ServiceInfo>builder()
                 .name(name)
-                .address(ip)
+                .address(host)
                 .port(port)
                 .payload(this)
                 .build();
