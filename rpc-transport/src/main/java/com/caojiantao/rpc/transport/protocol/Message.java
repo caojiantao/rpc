@@ -10,7 +10,5 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 public class Message<T> {
 
     private MessageHeader header;
-    @JsonIgnore
-    private byte[] bytes;
     private T body;
 }

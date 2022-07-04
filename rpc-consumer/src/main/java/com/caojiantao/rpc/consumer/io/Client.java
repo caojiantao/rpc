@@ -1,6 +1,6 @@
 package com.caojiantao.rpc.consumer.io;
 
-import com.caojiantao.rpc.registry.utils.SpringUtils;
+import com.caojiantao.rpc.common.utils.SpringUtils;
 import com.caojiantao.rpc.transport.codec.MessageDecoder;
 import com.caojiantao.rpc.transport.codec.MessageEncoder;
 import com.caojiantao.rpc.transport.protocol.EMessageType;
@@ -16,7 +16,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 
 @Slf4j
 public class Client {

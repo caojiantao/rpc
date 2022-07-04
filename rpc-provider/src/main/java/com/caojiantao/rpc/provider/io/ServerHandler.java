@@ -1,11 +1,11 @@
 package com.caojiantao.rpc.provider.io;
 
-import com.caojiantao.rpc.common.utils.JsonUtils;
-import com.caojiantao.rpc.registry.utils.SpringUtils;
+import com.caojiantao.rpc.common.utils.SpringUtils;
 import com.caojiantao.rpc.transport.protocol.EMessageType;
 import com.caojiantao.rpc.transport.protocol.Message;
 import com.caojiantao.rpc.transport.protocol.MessageHeader;
 import com.caojiantao.rpc.transport.protocol.RpcRequest;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -13,35 +13,31 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 @Slf4j
-public class ServerHandler extends SimpleChannelInboundHandler<Message> {
+public class ServerHandler extends SimpleChannelInboundHandler<Message<RpcRequest>> {
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
-        log.info("[rpc-provider] 服务端收到消息 {}", msg.getHeader());
-        MessageHeader header = msg.getHeader();
-        RpcRequest request = header.getSerialize().serialization.deserialize(msg.getBytes(), RpcRequest.class);
+    protected void channelRead0(ChannelHandlerContext ctx, Message<RpcRequest> reqMsg) throws Exception {
+        log.info("[rpc-provider] 服务端收到消息 {}", reqMsg);
+        MessageHeader reqHeader = reqMsg.getHeader();
+        RpcRequest rpcReq = reqMsg.getBody();
+        Method method = ReflectionUtils.findMethod(rpcReq.getClazz(), rpcReq.getName(), rpcReq.getParameterTypes());
+        Object[] args = rpcReq.getArgs();
         ApplicationContext context = SpringUtils.getContext();
-        Method method = ReflectionUtils.findMethod(request.getClazz(), request.getName(), request.getParameterTypes());
-        int argsLength = request.getParameterTypes().length;
-        Object[] args = new Object[argsLength];
-        for (int i = 0; i < argsLength; i++) {
-            byte[] argBytes = JsonUtils.bytes(request.getArgs()[i]);
-            Class<?> argType = request.getParameterTypes()[i];
-            Object arg = JsonUtils.parse(argBytes, argType);
-            args[i] = arg;
-        }
-        Object result = method.invoke(context.getBean(request.getClazz()), args);
+        Object result = method.invoke(context.getBean(rpcReq.getClazz()), args);
         Message<Object> respMsg = new Message<>();
         MessageHeader respMsgHeader = new MessageHeader();
-        respMsgHeader.setTraceId(header.getTraceId());
+        respMsgHeader.setTraceId(reqHeader.getTraceId());
         respMsgHeader.setType(EMessageType.RESPONSE);
         respMsg.setHeader(respMsgHeader);
         respMsg.setBody(result);
-
-        ctx.channel().writeAndFlush(respMsg).sync();
+        ChannelFuture sendFuture = ctx.channel().writeAndFlush(respMsg).sync();
+        if (sendFuture.isSuccess()) {
+            log.info("[rpc-provider] 服务端响应成功 {}", respMsg);
+        } else {
+            log.info("[rpc-provider] 服务端响应失败 {}", respMsg);
+        }
     }
 
     @Override

@@ -1,12 +1,14 @@
 package com.caojiantao.rpc.transport.protocol;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.Objects;
 
 /**
  * @author caojiantao
  */
+@Getter
 @AllArgsConstructor
 public enum EMessageType {
 
@@ -15,7 +17,7 @@ public enum EMessageType {
     RESPONSE((byte) 3),
     ;
 
-    public byte value;
+    private byte value;
 
     public static EMessageType ofValue(byte value) {
         for (EMessageType type : EMessageType.values()) {

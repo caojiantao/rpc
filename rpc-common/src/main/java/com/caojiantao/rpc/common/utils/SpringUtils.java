@@ -1,4 +1,4 @@
-package com.caojiantao.rpc.registry.utils;
+package com.caojiantao.rpc.common.utils;
 
 import org.springframework.context.ApplicationContext;
 

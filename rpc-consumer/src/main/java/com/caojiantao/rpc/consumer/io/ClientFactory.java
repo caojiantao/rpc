@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class ClientFactory {
 
-    private static Map<String, Client> clientMap = Maps.newHashMap();
+    private static Map<String, Client> clientMap = Maps.newConcurrentMap();
 
     public static Client create(ServiceInfo serviceInfo) {
         String key = serviceInfo.getHost() + ":" + serviceInfo.getPort();

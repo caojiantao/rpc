@@ -1,4 +1,4 @@
 zookeeper:
-  connectString: "192.168.3.55:2181"
+  connectString: "127.0.0.1:2181"
 server:
-  port: 8888
+  port: 6666

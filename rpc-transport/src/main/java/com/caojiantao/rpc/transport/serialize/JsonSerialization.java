@@ -9,7 +9,6 @@ import java.io.IOException;
  */
 public class JsonSerialization implements ISerialization {
 
-
     @Override
     public <T> byte[] serialize(T data) throws IOException {
         return JsonUtils.bytes(data);

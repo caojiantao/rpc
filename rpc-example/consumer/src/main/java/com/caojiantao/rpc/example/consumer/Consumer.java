@@ -25,6 +25,9 @@ public class Consumer {
         user = userService.findById(id);
         log.info("查找用户 {}", user);
 
+        user = userService.findById(0);
+        log.info("查找用户 {}", user);
+
         Boolean update = userService.updateName(id, "陈丽沙");
         log.info("更新用户 {}", update);
     }

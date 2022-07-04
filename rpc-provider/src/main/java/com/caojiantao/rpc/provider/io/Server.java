@@ -1,5 +1,6 @@
 package com.caojiantao.rpc.provider.io;
 
+import com.caojiantao.rpc.common.utils.IpUtils;
 import com.caojiantao.rpc.transport.codec.MessageDecoder;
 import com.caojiantao.rpc.transport.codec.MessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -43,18 +44,18 @@ public class Server implements InitializingBean, DisposableBean {
                         pipeline.addLast(new MessageEncoder());
                     }
                 });
-        ChannelFuture channelFuture = bootstrap.bind(port).sync();
+        String host = IpUtils.getHostIp();
+        ChannelFuture channelFuture = bootstrap.bind(host, port).sync();
         return channelFuture.isSuccess();
-//        channelFuture.channel().closeFuture().sync();
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         boolean success = this.start();
         if (success) {
-            log.info("[rpc-provider] 服务启动成功 {}", port);
+            log.info("[rpc-provider] 服务启动成功 {} {}", IpUtils.getHostIp(), port);
         } else {
-            log.error("[rpc-provider] 服务启动失败 {}", port);
+            log.error("[rpc-provider] 服务启动失败 {} {}", IpUtils.getHostIp(), port);
         }
     }
 

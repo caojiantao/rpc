@@ -1,7 +1,7 @@
 package com.caojiantao.rpc.registry.init;
 
 import com.caojiantao.rpc.registry.Registry;
-import com.caojiantao.rpc.registry.utils.SpringUtils;
+import com.caojiantao.rpc.common.utils.SpringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
