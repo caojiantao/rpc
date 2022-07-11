@@ -50,7 +50,7 @@ public class ProviderRegister implements BeanPostProcessor {
         serviceInfo.setPort(port);
         serviceInfo.setName(service.getName());
         registry.register(serviceInfo);
-        log.info("[rpc-core] 注册服务 {} {}:{}", serviceInfo.getName(), host, port);
+        log.info("[rpc-provider] 注册服务 {} {}:{}", serviceInfo.getName(), host, port);
         return bean;
     }
 }

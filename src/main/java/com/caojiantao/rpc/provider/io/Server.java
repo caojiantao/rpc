@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
@@ -23,6 +24,8 @@ public class Server implements InitializingBean, DisposableBean {
 
     @Autowired
     private RpcConfig rpcConfig;
+    @Autowired
+    private ListableBeanFactory beanFactory;
 
     public Server() {
         this.bossGroup = new NioEventLoopGroup();
@@ -41,7 +44,7 @@ public class Server implements InitializingBean, DisposableBean {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         ChannelPipeline pipeline = channel.pipeline();
                         pipeline.addLast(new MessageDecoder());
-                        pipeline.addLast(new ServerHandler());
+                        pipeline.addLast(new ServerHandler(beanFactory));
                         pipeline.addLast(new MessageEncoder());
                     }
                 });

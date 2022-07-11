@@ -6,7 +6,6 @@ import com.caojiantao.rpc.protocol.EMessageType;
 import com.caojiantao.rpc.protocol.Message;
 import com.caojiantao.rpc.protocol.MessageHeader;
 import com.caojiantao.rpc.protocol.RpcRequest;
-import com.caojiantao.rpc.utils.SpringUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -34,7 +33,6 @@ public class Client {
 
     @SneakyThrows
     public void connect() {
-        ClientHandler clientHandler = SpringUtils.getContext().getBean(ClientHandler.class);
         workGroup = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workGroup)
@@ -46,7 +44,7 @@ public class Client {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new MessageDecoder());
-                        ch.pipeline().addLast(clientHandler);
+                        ch.pipeline().addLast(new ClientHandler());
                         ch.pipeline().addLast(new MessageEncoder());
                     }
                 });

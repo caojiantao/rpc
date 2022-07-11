@@ -43,6 +43,7 @@ public class ProviderDiscovery implements ImportBeanDefinitionRegistrar {
                 // 添加动态代理类，统一处理
                 definition.setBeanClassName(ProviderFactoryBean.class.getName());
                 definition.getPropertyValues().add("clazz", clazz);
+                definition.getPropertyValues().add("beanFactory", beanFactory);
                 return true;
             }
         };

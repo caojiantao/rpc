@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class RpcResponse<T> {
 
     @Builder.Default
-    private Integer code = 20;
+    private Integer code = 200;
     private T body;
     private String message;
 }
