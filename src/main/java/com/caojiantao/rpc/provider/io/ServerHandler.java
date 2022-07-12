@@ -32,14 +32,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<Message<RpcReques
         Message<Object> respMsg = new Message<>();
         MessageHeader respMsgHeader = new MessageHeader();
         respMsgHeader.setTraceId(reqHeader.getTraceId());
-        respMsgHeader.setType(EMessageType.RESPONSE);
+        respMsgHeader.setType(EMessageType.RESP);
         respMsg.setHeader(respMsgHeader);
         respMsg.setBody(result);
         ChannelFuture sendFuture = ctx.channel().writeAndFlush(respMsg).sync();
         if (sendFuture.isSuccess()) {
             log.info("[rpc-provider] 服务端响应成功 {}", respMsg);
         } else {
-            log.info("[rpc-provider] 服务端响应失败 {}", respMsg);
+            log.error("[rpc-provider] 服务端响应失败 {}", respMsg);
         }
     }
 

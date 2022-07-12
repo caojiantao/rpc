@@ -3,18 +3,25 @@ package com.caojiantao.rpc.provider.io;
 import com.caojiantao.rpc.codec.MessageDecoder;
 import com.caojiantao.rpc.codec.MessageEncoder;
 import com.caojiantao.rpc.config.RpcConfig;
+import com.caojiantao.rpc.heart.ServerHeartHandler;
 import com.caojiantao.rpc.utils.IpUtils;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class Server implements InitializingBean, DisposableBean {
@@ -42,10 +49,12 @@ public class Server implements InitializingBean, DisposableBean {
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
-                        ChannelPipeline pipeline = channel.pipeline();
-                        pipeline.addLast(new MessageDecoder());
-                        pipeline.addLast(new ServerHandler(beanFactory));
-                        pipeline.addLast(new MessageEncoder());
+                        channel.pipeline()
+                                .addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS))
+                                .addLast(new MessageDecoder())
+                                .addLast(new ServerHeartHandler())
+                                .addLast(new ServerHandler(beanFactory))
+                                .addLast(new MessageEncoder());
                     }
                 });
         String host = IpUtils.getHostIp();

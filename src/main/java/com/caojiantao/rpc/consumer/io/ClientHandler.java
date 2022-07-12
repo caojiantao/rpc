@@ -6,7 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 public class ClientHandler extends SimpleChannelInboundHandler<Message<Object>> {
@@ -16,9 +16,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Message<Object>> 
         log.info("[rpc-consumer] 客户端收到消息 {}", msg);
         MessageHeader header = msg.getHeader();
         RequestFuture future = ClientRequestManager.getFuture(header.getTraceId());
-        if (Objects.nonNull(future)) {
-            future.set(msg);
-        }
+        Optional.ofNullable(future).ifPresent(item -> item.set(msg));
     }
 
     @Override

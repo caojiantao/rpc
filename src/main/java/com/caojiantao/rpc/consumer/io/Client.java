@@ -2,6 +2,7 @@ package com.caojiantao.rpc.consumer.io;
 
 import com.caojiantao.rpc.codec.MessageDecoder;
 import com.caojiantao.rpc.codec.MessageEncoder;
+import com.caojiantao.rpc.heart.ClientHeartHandler;
 import com.caojiantao.rpc.protocol.EMessageType;
 import com.caojiantao.rpc.protocol.Message;
 import com.caojiantao.rpc.protocol.MessageHeader;
@@ -11,6 +12,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,9 +45,14 @@ public class Client {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new MessageDecoder());
-                        ch.pipeline().addLast(new ClientHandler());
-                        ch.pipeline().addLast(new MessageEncoder());
+                        // 20 秒之内服务器没有响应则关闭连接
+                        // 10 秒之内没有请求则发送一个心跳包
+                        ch.pipeline()
+                                .addLast(new IdleStateHandler(20, 10, 0, TimeUnit.SECONDS))
+                                .addLast(new MessageDecoder())
+                                .addLast(new ClientHeartHandler())
+                                .addLast(new ClientHandler())
+                                .addLast(new MessageEncoder());
                     }
                 });
         ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
@@ -61,7 +68,7 @@ public class Client {
     public Object sendRequest(RpcRequest request) {
         Message<RpcRequest> message = new Message<>();
         MessageHeader header = new MessageHeader();
-        header.setType(EMessageType.REQUEST);
+        header.setType(EMessageType.REQ);
         message.setHeader(header);
         message.setBody(request);
         ChannelFuture channelFuture = channel.writeAndFlush(message).sync();

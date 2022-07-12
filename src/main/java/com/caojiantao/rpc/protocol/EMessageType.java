@@ -12,9 +12,10 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum EMessageType {
 
-    HEART((byte) 1),
-    REQUEST((byte) 2),
-    RESPONSE((byte) 3),
+    REQ((byte) 1),
+    RESP((byte) 2),
+    PING((byte) 3),
+    PONG((byte) 4),
     ;
 
     private byte value;
