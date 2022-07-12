@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
@@ -47,6 +48,11 @@ public class ProviderDiscovery implements ImportBeanDefinitionRegistrar {
                 return true;
             }
         };
+        BeanNameGenerator beanNameGenerator = (beanDefinition, beanDefinitionRegistry) -> {
+            Class clazz = (Class) beanDefinition.getPropertyValues().get("clazz");
+            return clazz.getName();
+        };
+        scanner.setBeanNameGenerator(beanNameGenerator);
         scanner.addIncludeFilter(new AnnotationTypeFilter(RpcService.class));
         // 扫描到的合法 candidate 自动注册
         scanner.scan(basePackages);

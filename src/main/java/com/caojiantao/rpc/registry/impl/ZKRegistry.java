@@ -11,7 +11,10 @@ import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceProvider;
 import org.apache.curator.x.discovery.strategies.RandomStrategy;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author caojiantao
@@ -58,5 +61,12 @@ public class ZKRegistry implements IRegistry {
             log.error("[rpc-registry] 获取服务信息异常", e);
         }
         return serviceInfo;
+    }
+
+    @SneakyThrows
+    @Override
+    public List<ServiceInfo> list(String service) {
+        Collection<ServiceInstance<ServiceInfo>> instances = discovery.queryForInstances(service);
+        return instances.stream().map(ServiceInstance::getPayload).collect(Collectors.toList());
     }
 }

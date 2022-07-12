@@ -64,20 +64,19 @@ public class Client {
         this.channel = channelFuture.channel();
     }
 
-    @SneakyThrows
-    public Object sendRequest(RpcRequest request) {
+    public Object sendRequest(RpcRequest request, boolean sync) {
         Message<RpcRequest> message = new Message<>();
         MessageHeader header = new MessageHeader();
         header.setType(EMessageType.REQ);
         message.setHeader(header);
         message.setBody(request);
-        ChannelFuture channelFuture = channel.writeAndFlush(message).sync();
-        if (channelFuture.isSuccess()) {
-            log.info("[rpc-consumer] 发起请求成功 {}", request);
-        } else {
-            log.error("[rpc-consumer] 发起请求失败 {}", request);
+        log.info("[rpc-consumer] {}发出请求请求 {}", sync ? "同步" : "异步", request);
+        channel.writeAndFlush(message);
+        Object resp = null;
+        if (sync) {
+            RequestFuture requestFuture = new RequestFuture(message);
+            resp = requestFuture.get(1, TimeUnit.SECONDS);
         }
-        RequestFuture requestFuture = new RequestFuture(message);
-        return requestFuture.get(1, TimeUnit.SECONDS);
+        return resp;
     }
 }
