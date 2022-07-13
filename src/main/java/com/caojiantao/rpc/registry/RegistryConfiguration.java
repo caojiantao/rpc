@@ -1,5 +1,9 @@
 package com.caojiantao.rpc.registry;
 
+import com.caojiantao.rpc.balancer.IBalancer;
+import com.caojiantao.rpc.balancer.impl.RandomBalancer;
+import com.caojiantao.rpc.balancer.impl.RoundBalancer;
+import com.caojiantao.rpc.balancer.impl.WeightedRandomBalancer;
 import com.caojiantao.rpc.config.RegistryConfig;
 import com.caojiantao.rpc.config.RpcConfig;
 import com.caojiantao.rpc.registry.impl.ZKRegistry;
@@ -28,5 +32,20 @@ public class RegistryConfiguration {
     @ConditionalOnBean(CuratorFramework.class)
     public ZKRegistry registry(CuratorFramework curator) throws Exception {
         return new ZKRegistry(curator);
+    }
+
+    @Bean
+    public IBalancer<ServiceInfo> randomBalancer() {
+        return new RandomBalancer();
+    }
+
+    @Bean
+    public IBalancer<ServiceInfo> roundBalancer() {
+        return new RoundBalancer();
+    }
+
+    @Bean
+    public IBalancer<ServiceInfo> weightedRandomBalancer() {
+        return new WeightedRandomBalancer();
     }
 }

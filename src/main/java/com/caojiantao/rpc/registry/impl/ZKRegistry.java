@@ -1,5 +1,6 @@
 package com.caojiantao.rpc.registry.impl;
 
+import com.caojiantao.rpc.balancer.IBalancer;
 import com.caojiantao.rpc.registry.IRegistry;
 import com.caojiantao.rpc.registry.ServiceInfo;
 import lombok.SneakyThrows;
@@ -9,7 +10,6 @@ import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceProvider;
-import org.apache.curator.x.discovery.strategies.RandomStrategy;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,21 +35,28 @@ public class ZKRegistry implements IRegistry {
     @SneakyThrows
     @Override
     public void register(ServiceInfo serviceInfo) {
-        discovery.registerService(serviceInfo.toInstance());
+        ServiceInstance<ServiceInfo> instance = toInstance(serviceInfo);
+        discovery.registerService(instance);
     }
 
     @SneakyThrows
     @Override
     public void unregister(ServiceInfo serviceInfo) {
-        discovery.unregisterService(serviceInfo.toInstance());
+        ServiceInstance<ServiceInfo> instance = toInstance(serviceInfo);
+        discovery.unregisterService(instance);
     }
 
     @Override
-    public ServiceInfo load(String service) {
+    public ServiceInfo load(String service, IBalancer<ServiceInfo> balancer) {
         ServiceInfo serviceInfo = null;
         try (ServiceProvider<ServiceInfo> provider = discovery.serviceProviderBuilder()
-                // todo 负载策略
-                .providerStrategy(new RandomStrategy<>())
+                // see org.apache.curator.x.discovery.strategies.RandomStrategy
+                .providerStrategy(instanceProvider -> {
+                    List<ServiceInstance<ServiceInfo>> list = instanceProvider.getInstances();
+                    List<ServiceInfo> payloadList = list.stream().map(ServiceInstance::getPayload).collect(Collectors.toList());
+                    ServiceInfo payload = balancer.choose(payloadList);
+                    return toInstance(payload);
+                })
                 .serviceName(service)
                 .build()) {
             provider.start();
@@ -68,5 +75,15 @@ public class ZKRegistry implements IRegistry {
     public List<ServiceInfo> list(String service) {
         Collection<ServiceInstance<ServiceInfo>> instances = discovery.queryForInstances(service);
         return instances.stream().map(ServiceInstance::getPayload).collect(Collectors.toList());
+    }
+
+    @SneakyThrows
+    public ServiceInstance<ServiceInfo> toInstance(ServiceInfo serviceInfo) {
+        return ServiceInstance.<ServiceInfo>builder()
+                .name(serviceInfo.getName())
+                .address(serviceInfo.getHost())
+                .port(serviceInfo.getPort())
+                .payload(serviceInfo)
+                .build();
     }
 }

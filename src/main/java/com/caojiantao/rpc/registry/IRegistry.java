@@ -1,5 +1,7 @@
 package com.caojiantao.rpc.registry;
 
+import com.caojiantao.rpc.balancer.IBalancer;
+
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ public interface IRegistry {
 
     void unregister(ServiceInfo serviceInfo);
 
-    ServiceInfo load(String service);
+    ServiceInfo load(String service, IBalancer<ServiceInfo> balancer);
 
     List<ServiceInfo> list(String service);
 }
