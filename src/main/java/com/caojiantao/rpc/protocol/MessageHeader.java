@@ -19,8 +19,7 @@ public class MessageHeader {
 
     @Builder.Default
     private Byte magic = Constants.MAGIC;
-    @Builder.Default
-    private String traceId = UUID.randomUUID().toString().replaceAll("-", "");
+    private String traceId;
     @Builder.Default
     private Byte version = 1;
     @Builder.Default

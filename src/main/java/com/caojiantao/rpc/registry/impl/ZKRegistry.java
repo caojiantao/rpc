@@ -78,7 +78,7 @@ public class ZKRegistry implements IRegistry {
     }
 
     @SneakyThrows
-    public ServiceInstance<ServiceInfo> toInstance(ServiceInfo serviceInfo) {
+    private ServiceInstance<ServiceInfo> toInstance(ServiceInfo serviceInfo) {
         return ServiceInstance.<ServiceInfo>builder()
                 .name(serviceInfo.getName())
                 .address(serviceInfo.getHost())
