@@ -18,6 +18,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.Map;
 
 @Slf4j
+@SuppressWarnings("all")
 public class ProviderDiscovery implements ImportBeanDefinitionRegistrar {
 
     @Override
@@ -39,6 +40,7 @@ public class ProviderDiscovery implements ImportBeanDefinitionRegistrar {
                 ListableBeanFactory beanFactory = (ListableBeanFactory) registry;
                 String[] exists = beanFactory.getBeanNamesForType(clazz);
                 if (!ObjectUtils.isEmpty(exists)) {
+                    // 已经注册过该类型的 bean
                     return false;
                 }
                 // 添加动态代理类，统一处理
@@ -48,6 +50,7 @@ public class ProviderDiscovery implements ImportBeanDefinitionRegistrar {
                 return true;
             }
         };
+        // 重写 beanName，避免 bean 冲突
         BeanNameGenerator beanNameGenerator = (beanDefinition, beanDefinitionRegistry) -> {
             Class clazz = (Class) beanDefinition.getPropertyValues().get("clazz");
             return clazz.getName();

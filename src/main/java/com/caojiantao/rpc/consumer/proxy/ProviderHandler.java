@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @AllArgsConstructor
-public class ProviderProxy<T> implements InvocationHandler {
+public class ProviderHandler<T> implements InvocationHandler {
 
     private ListableBeanFactory beanFactory;
 

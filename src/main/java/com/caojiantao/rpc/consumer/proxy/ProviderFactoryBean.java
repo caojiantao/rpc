@@ -17,9 +17,9 @@ public class ProviderFactoryBean<T> implements FactoryBean<T> {
 
     @Override
     public T getObject() throws Exception {
-        ProviderProxy proxy = new ProviderProxy(beanFactory);
-        Object o = Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, proxy);
-        return (T) o;
+        ProviderHandler handler = new ProviderHandler(beanFactory);
+        Object proxy = Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, handler);
+        return (T) proxy;
     }
 
     @Override
